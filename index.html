@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FF6B35">
+<title>우리 집 교육 캐릭터 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Gmarket+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #FF6B35;
+    --primary-dark: #E85520;
+    --secondary: #FFF3EE;
+    --accent-yellow: #FFD166;
+    --accent-teal: #06D6A0;
+    --accent-blue: #118AB2;
+    --dark: #1A1A2E;
+    --gray: #6B7280;
+    --light-gray: #F3F4F6;
+    --white: #FFFFFF;
+    --shadow: 0 8px 32px rgba(255,107,53,0.15);
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.08);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #FAFAFA;
+    color: var(--dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── 공통 유틸 ── */
+  .hidden { display: none !important; }
+
+  /* ── 화면 래퍼 ── */
+  .screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 0 40px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══════════════════════════════
+     INTRO SCREEN
+  ══════════════════════════════ */
+  #screen-intro {
+    background: linear-gradient(160deg, #FF6B35 0%, #FF9A5C 40%, #FFD166 100%);
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #screen-intro::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .intro-badge {
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 50px;
+    margin-bottom: 28px;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(4px);
+  }
+
+  .intro-emoji-row {
+    font-size: 48px;
+    margin-bottom: 20px;
+    letter-spacing: 8px;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+
+  .intro-title {
+    font-family: 'Gmarket Sans', 'Noto Sans KR', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+
+  .intro-subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.9);
+    text-align: center;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .intro-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    max-width: 380px;
+    width: 100%;
+    margin-bottom: 28px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  }
+
+  .intro-card p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #444;
+    text-align: center;
+  }
+
+  .intro-card p strong {
+    color: var(--primary);
+  }
+
+  .intro-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .stat-item {
+    flex: 1;
+    background: var(--secondary);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Gmarket Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  .btn-start {
+    background: var(--dark);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 48px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: 'Gmarket Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(26,26,46,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-start:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(26,26,46,0.4);
+  }
+
+  .btn-start:active { transform: scale(0.97); }
+
+  /* ══════════════════════════════
+     QUESTION SCREEN
+  ══════════════════════════════ */
+  #screen-question {
+    background: #FAFAFA;
+    padding: 0;
+  }
+
+  .q-header {
+    width: 100%;
+    background: var(--white);
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid #F0F0F0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+
+  .q-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .q-num {
+    font-family: 'Gmarket Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    white-space: nowrap;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #F0F0F0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent-yellow));
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .q-timer {
+    font-size: 12px;
+    color: var(--gray);
+    white-space: nowrap;
+  }
+
+  .q-body {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 28px 20px 24px;
+  }
+
+  .q-scene {
+    background: linear-gradient(135deg, #FFF3EE, #FFF8F5);
+    border: 1.5px solid #FFD8C4;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+  }
+
+  .q-scene .scene-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .q-scene .scene-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.5;
+  }
+
+  .q-scene .scene-quote {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: rgba(255,107,53,0.08);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    font-size: 15px;
+    color: #555;
+  }
+
+  .q-instruction {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .q-option {
+    background: var(--white);
+    border: 2px solid #E8E8E8;
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .q-option:hover {
+    border-color: var(--primary);
+    background: var(--secondary);
+    transform: translateX(4px);
+  }
+
+  .q-option.selected {
+    border-color: var(--primary);
+    background: var(--secondary);
+    box-shadow: 0 0 0 4px rgba(255,107,53,0.1);
+  }
+
+  .option-badge {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #F0F0F0;
+    color: var(--gray);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .q-option.selected .option-badge {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .option-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #333;
+  }
+
+  .btn-next {
+    width: 100%;
+    max-width: 480px;
+    margin: 16px auto 0;
+    display: block;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .btn-next.active {
+    opacity: 1;
+    pointer-events: auto;
+    box-shadow: var(--shadow);
+  }
+
+  .btn-next.active:hover { transform: translateY(-2px); }
+
+  /* ══════════════════════════════
+     LOADING SCREEN
+  ══════════════════════════════ */
+  #screen-loading {
+    background: var(--dark);
+    justify-content: center;
+    gap: 24px;
+    padding: 40px 20px;
+  }
+
+  .loading-emoji {
+    font-size: 64px;
+    animation: spin-bounce 1.2s ease-in-out infinite;
+  }
+
+  @keyframes spin-bounce {
+    0%,100% { transform: scale(1) rotate(0deg); }
+    50%      { transform: scale(1.2) rotate(10deg); }
+  }
+
+  .loading-text {
+    font-family: 'Gmarket Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .loading-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+  }
+
+  .loading-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .loading-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: dot-bounce 1.2s ease-in-out infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dot-bounce {
+    0%,100% { transform: translateY(0); opacity: 0.4; }
+    50%      { transform: translateY(-12px); opacity: 1; }
+  }
+
+  /* ══════════════════════════════
+     RESULT SCREEN
+  ══════════════════════════════ */
+  #screen-result {
+    background: #FAFAFA;
+    padding: 0 0 60px;
+  }
+
+  .result-hero {
+    width: 100%;
+    padding: 48px 20px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .result-hero > * { position: relative; z-index: 1; }
+
+  .result-animal {
+    font-size: 80px;
+    margin-bottom: 12px;
+    display: block;
+    animation: pop-in 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  @keyframes pop-in {
+    0%   { transform: scale(0.5); opacity: 0; }
+    70%  { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .result-type-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  .result-type-name {
+    font-family: 'Gmarket Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .result-tagline {
+    font-size: 15px;
+    line-height: 1.8;
+    max-width: 320px;
+    margin: 0 auto 20px;
+    font-style: italic;
+    opacity: 0.85;
+  }
+
+  .result-hashtags {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .hashtag {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 50px;
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(4px);
+    font-weight: 600;
+  }
+
+  /* 결과 콘텐츠 카드 */
+  .result-content {
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  .result-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow-card);
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .result-card:nth-child(2) { animation-delay: 0.1s; }
+  .result-card:nth-child(3) { animation-delay: 0.2s; }
+  .result-card:nth-child(4) { animation-delay: 0.3s; }
+  .result-card:nth-child(5) { animation-delay: 0.4s; }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--light-gray);
+  }
+
+  .fact-bomb {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #444;
+  }
+
+  .fact-bomb strong {
+    color: var(--dark);
+  }
+
+  .child-voice {
+    background: linear-gradient(135deg, #F0FFF4, #E6FFFA);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #2D6A4F;
+    border-left: 4px solid var(--accent-teal);
+    font-style: italic;
+  }
+
+  .strength-text {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #444;
+  }
+
+  .today-sentence {
+    background: linear-gradient(135deg, #FFF8E7, #FFFBF0);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.6;
+    text-align: center;
+    border: 2px dashed var(--accent-yellow);
+    position: relative;
+  }
+
+  .today-sentence::before {
+    content: '💬';
+    font-size: 20px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* 감동 마무리 카드 */
+  .finale-card {
+    background: var(--dark);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(26,26,46,0.2);
+    animation: fadeIn 0.6s ease 0.5s both;
+  }
+
+  .finale-card .finale-emoji { font-size: 32px; margin-bottom: 14px; }
+
+  .finale-card .finale-title {
+    font-family: 'Gmarket Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-yellow);
+    margin-bottom: 16px;
+  }
+
+  .finale-card .finale-text {
+    font-size: 14px;
+    line-height: 2;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 20px;
+  }
+
+  .finale-card .finale-highlight {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    line-height: 1.7;
+  }
+
+  /* 상담 버튼 */
+  .consult-card {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-align: center;
+    animation: fadeIn 0.6s ease 0.6s both;
+    box-shadow: var(--shadow);
+  }
+
+  .consult-question {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .btn-consult {
+    display: block;
+    width: 100%;
+    background: #fff;
+    color: var(--primary-dark);
+    border: none;
+    border-radius: 50px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+  }
+
+  .btn-consult:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+  .btn-capture {
+    display: block;
+    width: 100%;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 50px;
+    padding: 13px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+
+  .btn-capture:hover { background: rgba(255,255,255,0.25); }
+
+  .btn-retry {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50px;
+    padding: 13px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-retry:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  /* 통계 섹션 */
+  .stats-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .stats-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+
+  .stats-bar-row:last-child { margin-bottom: 0; }
+
+  .stats-emoji { font-size: 18px; width: 28px; text-align: center; }
+
+  .stats-name {
+    width: 90px;
+    color: var(--gray);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .stats-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--light-gray);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .stats-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--primary), var(--accent-yellow));
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+
+  .stats-bar-fill.highlight {
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  }
+
+  .stats-pct {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray);
+    width: 32px;
+    text-align: right;
+  }
+
+  /* 반응형 */
+  @media (max-width: 380px) {
+    .intro-title { font-size: 24px; }
+    .result-type-name { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ 인트로 ══════════ -->
+<section class="screen" id="screen-intro">
+  <div class="intro-badge">🎉 창원경일고 학부모 설명회 특별 이벤트</div>
+  <div class="intro-emoji-row">🐴🦥🕵️🎢</div>
+  <h1 class="intro-title">우리 집 교육<br>캐릭터 테스트</h1>
+  <p class="intro-subtitle">
+    2분 만에 알아보는<br>
+    <strong style="color:#fff;font-weight:900">"입시 앞에서 나는 어떤 학부모일까?"</strong>
+  </p>
+  <div class="intro-card">
+    <p>
+      부모님을 <strong>평가하는 검사가 아닙니다.</strong><br>
+      우리 아이를 사랑하는 방식이 조금 다를 뿐입니다.<br><br>
+      단, 결과를 보고 <strong>살짝 뜨끔할 수 있습니다. 😅</strong>
+    </p>
+    <div class="intro-stats">
+      <div class="stat-item">
+        <span class="stat-num">9</span>
+        <div class="stat-label">문항</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">2분30초</span>
+        <div class="stat-label">소요시간</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">8가지</span>
+        <div class="stat-label">캐릭터 유형</div>
+      </div>
+    </div>
+  </div>
+  <button class="btn-start" onclick="startTest()">🔍 내 안의 학부모 캐릭터 찾기</button>
+</section>
+
+<!-- ══════════ 질문 ══════════ -->
+<section class="screen hidden" id="screen-question">
+  <div class="q-header">
+    <div class="q-progress-row">
+      <span class="q-num" id="q-num-text">1 / 9</span>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:12.5%"></div>
+      </div>
+      <span class="q-timer" id="q-timer">⏱ 2:30</span>
+    </div>
+  </div>
+
+  <div class="q-body">
+    <div class="q-scene" id="q-scene-box">
+      <span class="scene-label">📍 오늘 아침 우리 집</span>
+      <div class="scene-text" id="q-scene-text"></div>
+      <div class="scene-quote hidden" id="q-scene-quote"></div>
+    </div>
+    <p class="q-instruction">가장 솔직한 반응을 선택하세요</p>
+    <div class="q-options" id="q-options"></div>
+  </div>
+
+  <button class="btn-next" id="btn-next" onclick="nextQuestion()">다음 →</button>
+</section>
+
+<!-- ══════════ 로딩 ══════════ -->
+<section class="screen hidden" id="screen-loading">
+  <div class="loading-emoji" id="loading-emoji">🔍</div>
+  <div class="loading-text" id="loading-text">성향 분석 중...</div>
+  <div class="loading-sub" id="loading-sub">솔직하게 답하셨죠? 😅</div>
+  <div class="loading-dots">
+    <span></span><span></span><span></span>
+  </div>
+</section>
+
+<!-- ══════════ 결과 ══════════ -->
+<section class="screen hidden" id="screen-result">
+  <div class="result-hero" id="result-hero">
+    <div class="result-hero-bg" id="result-hero-bg"></div>
+    <span class="result-animal" id="result-animal"></span>
+    <div class="result-type-label">나의 학부모 캐릭터</div>
+    <div class="result-type-name" id="result-type-name"></div>
+    <div class="result-tagline" id="result-tagline"></div>
+    <div class="result-hashtags" id="result-hashtags"></div>
+  </div>
+
+  <div class="result-content">
+
+    <!-- 팩트 폭행 -->
+    <div class="result-card">
+      <div class="card-label">💥 팩트 폭행</div>
+      <div class="fact-bomb" id="result-fact"></div>
+    </div>
+
+    <!-- 아이의 속마음 -->
+    <div class="result-card">
+      <div class="card-label">🧒 아이의 속마음</div>
+      <div class="child-voice" id="result-child-voice"></div>
+    </div>
+
+    <!-- 강점 -->
+    <div class="result-card">
+      <div class="card-label">💪 이런 강점이 있어요</div>
+      <div class="strength-text" id="result-strength"></div>
+    </div>
+
+    <!-- 오늘의 한 문장 -->
+    <div class="result-card">
+      <div class="card-label">✨ 오늘부터 써볼 한 문장</div>
+      <div class="today-sentence" id="result-sentence"></div>
+    </div>
+
+    <!-- 참여자 통계 -->
+    <div class="result-card stats-card">
+      <div class="card-label">📊 설명회용 샘플 유형 분포</div>
+      <div id="stats-bars"></div>
+    </div>
+
+    <!-- 감동 마무리 -->
+    <div class="finale-card">
+      <div class="finale-emoji">❤️</div>
+      <div class="finale-title">유형은 달라도, 단 하나 같은 것이 있습니다</div>
+      <div class="finale-text">
+        경주마처럼 달리는 것도,<br>
+        부처처럼 기다리는 것도,<br>
+        비밀리에 서포트하는 것도,<br>
+        같이 울고 웃는 것도...
+      </div>
+      <div class="finale-highlight">
+        결국 내 아이를 너무나 사랑하고,<br>
+        잘 되기를 바라는 부모님의 마음입니다. 🙏
+      </div>
+    </div>
+
+    <!-- 상담 연결 -->
+    <div class="consult-card">
+      <div class="consult-question" id="result-consult-q"></div>
+      <button class="btn-consult" id="btn-consult">📋 결과 바탕으로 상담 질문 만들기</button>
+      <button class="btn-capture" onclick="openCapture()">📸 결과 화면 저장하기</button>
+      <button class="btn-retry" onclick="retryTest()">🔄 다시 테스트하기</button>
+    </div>
+
+  </div>
+</section>
+
+<script>
+// ══════════════════════════
+// 데이터
+// ══════════════════════════
+
+const QUESTIONS = [
+  {
+    scene: "아침 7시 50분, 아이가 외칩니다.",
+    quote: "\"엄마! 나 체육복 어디 있어?\"",
+    options: [
+      { text: "\"세탁기 옆 두 번째 바구니. 그리고 오늘 수행평가 있지?\"", type: "A" },
+      { text: "\"어라? 한 번 잘 찾아봐. 있을 거야.\"", type: "B" },
+      { text: "(말없이 3초 만에 찾아 가방에 슥 넣어주고 용돈도 찔러줌)", type: "C" },
+      { text: "\"그걸 왜 지금 찾아!\" 하고 같이 허둥지둥한다.", type: "D" }
+    ]
+  },
+  {
+    scene: "시험이 끝나고 아이가 말합니다.",
+    quote: "\"이번 시험 진짜 망했어…\"",
+    options: [
+      { text: "\"어디서 틀렸는지부터 같이 보자.\"", type: "A" },
+      { text: "\"고생했다. 일단 밥 먹자.\"", type: "B" },
+      { text: "\"괜찮아.\" 하고 몰래 입시 정보를 검색한다.", type: "C" },
+      { text: "\"아이고 어떡해… 네 마음이 얼마나 힘들까 ㅠㅠ\"", type: "D" }
+    ]
+  },
+  {
+    scene: "시험 기간인데 아이 방에서 1시간째 폰 소리가 들립니다.",
+    quote: null,
+    options: [
+      { text: "문 벌컥 열고 주간 계획표 가리키며 눈으로 말한다.", type: "A" },
+      { text: "'피곤한가 보네...' 하고 부엌에 가서 과일을 깎는다.", type: "B" },
+      { text: "화면에 반사된 앱 확인 후 조용히 문을 닫는다.", type: "C" },
+      { text: "\"시험이 내일인데 지금 폰이 눈에 들어와?!\" (사자후)", type: "D" }
+    ]
+  },
+  {
+    scene: "아이가 말합니다.",
+    quote: "\"나 아직 꿈이 없어.\"",
+    options: [
+      { text: "\"그럼 지금부터 찾아야지. 계획 세워보자.\"", type: "A" },
+      { text: "\"없을 수도 있지. 천천히 찾으면 돼.\"", type: "B" },
+      { text: "\"잠깐만. 진로검사랑 학과 정보 찾아볼게.\"", type: "C" },
+      { text: "\"괜찮아\"라고 말하지만 속으로 심장이 빨라진다.", type: "D" }
+    ]
+  },
+  {
+    scene: "학교에서 선택과목 안내문이 왔습니다.",
+    quote: null,
+    options: [
+      { text: "\"이 과목이 대학 전공과 연결되나?\" (바로 분석 시작)", type: "A" },
+      { text: "\"아이가 좋아하는 과목이면 됐지.\"", type: "B" },
+      { text: "\"일단 선배 학부모 후기부터 확인해야겠다.\"", type: "C" },
+      { text: "\"이 선택이 나중에 불리하면 어떡하지...\" (불안 시작)", type: "D" }
+    ]
+  },
+  {
+    scene: "아이가 한숨을 쉬며 말합니다.",
+    quote: "\"엄마, 생기부에 쓸 만한 활동이 없는 것 같아.\"",
+    options: [
+      { text: "\"이번 학기 수업 활동부터 같이 정리해보자.\"", type: "A" },
+      { text: "\"억지로 만들기보다 네가 진짜 관심 가진 걸 찾자.\"", type: "B" },
+      { text: "\"학교 프로그램, 동아리, 진로활동 정보 찾아볼게.\"", type: "C" },
+      { text: "\"지금까지 뭐 한 거지?\" 라는 생각이 먼저 든다.", type: "D" }
+    ]
+  },
+  {
+    scene: "수행평가 전날 밤, 아이가 이제 자료를 만들기 시작합니다.",
+    quote: null,
+    options: [
+      { text: "\"왜 미뤘어? 남은 시간 계획부터 세우자.\"", type: "A" },
+      { text: "\"이번 경험도 배움이지.\" (조용히 기다림)", type: "B" },
+      { text: "(말없이 간식과 프린터를 준비한다)", type: "C" },
+      { text: "\"너도 힘들지? 근데 내 심장도 지금 떨려...\"", type: "D" }
+    ]
+  },
+  {
+    scene: "요즘 아이가 방문을 닫고 대화를 피합니다.",
+    quote: null,
+    options: [
+      { text: "대화할 시간을 정해서라도 이야기한다.", type: "A" },
+      { text: "기다린다. 언젠가 나오겠지.", type: "B" },
+      { text: "표정, 식사량, 귀가시간을 조용히 관찰한다.", type: "C" },
+      { text: "\"내가 뭘 잘못했나?\" 하고 하루 종일 신경 쓴다.", type: "D" }
+    ]
+  },
+  {
+    scene: "담임 선생님과 상담 기회가 생겼습니다. 가장 묻고 싶은 것은?",
+    quote: null,
+    options: [
+      { text: "\"현재 학습 위치와 앞으로의 성장 가능성은 어떻게 보시나요?\"", type: "A" },
+      { text: "\"학교생활 잘 하고 있나요?\"", type: "B" },
+      { text: "\"선택과목과 진로 방향 어떻게 잡으면 좋을까요?\"", type: "C" },
+      { text: "\"우리 아이 멘탈이 괜찮아 보이나요?\"", type: "D" }
+    ]
+  }
+];
+
+const TYPES = {
+  "경주마 매니저형": {
+    emoji: "🐴",
+    color: "#FF6B35",
+    bgGrad: "linear-gradient(160deg,#FF6B35,#FF9A5C,#FFD166)",
+    textColor: "#fff",
+    tagline: "겉으로는 쿨한 척하지만,\n마음속으론 이미 자녀 대학 입학식 축사 쓰는 중.",
+    fact: "시험지를 보면 '고생했어'보다 <strong>틀린 문제가 먼저 보입니다.</strong>\n사랑이 없는 게 아닙니다. 사랑이 너무 빠르게 분석표로 변환될 뿐입니다.",
+    childVoice: "\"엄마·아빠가 날 사랑하는 건 알겠는데,\n가끔 부장 선생님이랑 사는 것 같아…\"",
+    strength: "방향을 잃지 않게 잡아주고, 중요한 시기에 실행력을 만들어줍니다. 아이가 막막할 때 가장 든든한 내비게이션이 됩니다.",
+    sentence: "\"틀린 것부터 보기 전에,\n이번에 네가 버틴 것도 먼저 듣고 싶어.\"",
+    consultQ: "우리 아이에게 지금 필요한 것은\n더 촘촘한 계획일까요, 아니면 숨 쉴 여백일까요?",
+    consultBtn: "아이와 싸우지 않는 입시 전략 점검하기",
+    hashtags: ["#계획은사랑이다", "#잔소리아님전략임", "#입시작전회의"]
+  },
+  "나무늘보 부처님형": {
+    emoji: "🦥",
+    color: "#06D6A0",
+    bgGrad: "linear-gradient(160deg,#06D6A0,#48CAE4,#ADE8F4)",
+    textColor: "#fff",
+    tagline: "\"건강하면 됐다\"가 모토인데,\n진짜 건강만 할까 봐 요즘 살짝 무서움.",
+    fact: "성적표를 숨겨도 '그럴 수 있지' 하고 넘어갑니다.\n사실은 <strong>입시 제도가 너무 복잡해서 마음속으로\n잠깐 전원 버튼을 끈 적도 있습니다.</strong>",
+    childVoice: "\"우리 부모님은 나를 믿는 걸까,\n아니면 포기한 걸까?\"",
+    strength: "아이가 실패해도 무너지지 않게 해주는 안정감이 있습니다. 집이 숨 쉴 수 있는 공간이 되게 해주는 특별한 능력입니다.",
+    sentence: "\"천천히 가도 괜찮아.\n대신 이번 달에 하나만 정해서 해보자.\"",
+    consultQ: "기다림과 방치의 경계는 어디쯤일까요?\n아이에게 지금 방향 제시가 필요한 시기일 수 있습니다.",
+    consultBtn: "기다림과 방치 사이 점검하기",
+    hashtags: ["#건강제일", "#믿음과방목사이", "#괜찮겠지"]
+  },
+  "음지의 비밀요원형": {
+    emoji: "🕵️",
+    color: "#3D405B",
+    bgGrad: "linear-gradient(160deg,#3D405B,#6B6F9A,#9FA8DA)",
+    textColor: "#fff",
+    tagline: "나는 아무 말 안 했다.\n다만 이미 다 알고 있을 뿐.",
+    fact: "아이 앞에서는 \"하고 싶은 거 해\"라고 말하지만,\n<strong>새벽 2시에 입시 밴드와 학교 진로진학 자료를 정독합니다.</strong>\n아이 수행평가 일정도 아이보다 먼저 알고 있을 가능성이 높습니다.",
+    childVoice: "\"내가 말 안 한 수행평가를\n어떻게 알고 있지… 귀신인가?\"",
+    strength: "필요한 순간에 정확한 정보를 제공하고, 아이 뒤에서 안전망을 만들어줍니다. 조용한 서포터의 힘이 있습니다.",
+    sentence: "\"내가 찾아본 게 있는데,\n네가 원하면 같이 볼까?\"",
+    consultQ: "정보를 언제, 어느 정도까지\n아이와 나누는 것이 좋을까요?",
+    consultBtn: "정보를 대화로 바꾸는 방법 보기",
+    hashtags: ["#티안나는정보왕", "#입시밴드상주", "#내가모르는척해줄게"]
+  },
+  "감정 롤러코스터형": {
+    emoji: "🎢",
+    color: "#EF476F",
+    bgGrad: "linear-gradient(160deg,#EF476F,#FF6B6B,#FFB3C6)",
+    textColor: "#fff",
+    tagline: "아이 성적표가 나왔는데,\n왜 내 심장이 시험을 보나요?",
+    fact: "<strong>화냈다가, 미안해서 야식 사줬다가,\n다시 공부 안 하는 모습 보고 뒷목 잡습니다.</strong>\n사랑이 깊어서 반응도 깊습니다.",
+    childVoice: "\"엄마·아빠, 제발\n감정의 평화를 유지해줘…\"",
+    strength: "아이의 표정, 말투, 기분 변화를 누구보다 빠르게 알아차립니다. 아이가 외롭지 않도록 함께해주는 공감 능력이 탁월합니다.",
+    sentence: "\"나도 걱정되지만,\n먼저 네 마음부터 듣고 싶어.\"",
+    consultQ: "아이의 불안을 함께 키우지 않고\n받아주는 방법은 무엇일까요?",
+    consultBtn: "아이와의 대화법 점검하기",
+    hashtags: ["#공감왕", "#성적표보다내심장", "#아이울면나도운다"]
+  },
+  "입시레이더 여우형": {
+    emoji: "🦊",
+    color: "#F77F00",
+    bgGrad: "linear-gradient(160deg,#F77F00,#FCBF49,#EAE2B7)",
+    textColor: "#fff",
+    tagline: "학교 공지보다 빠르고,\n아이 말보다 입시 밴드 알림을 먼저 봅니다.",
+    fact: "선택과목, 생기부, 학과 전망, 전형 변화에 민감합니다.\n<strong>문제는 정보가 많아질수록 마음도 같이 바빠진다는 점입니다.</strong>",
+    childVoice: "\"내 진로보다 부모님 검색 기록이\n더 열심히 사는 것 같아…\"",
+    strength: "아이에게 필요한 기회와 정보를 빠르게 포착합니다. 변화하는 입시 환경에서 아이가 뒤처지지 않도록 발 빠르게 대응합니다.",
+    sentence: "\"이 정보가 너에게 도움이 될지\n같이 판단해보자.\"",
+    consultQ: "정보의 양보다\n우리 아이에게 맞는 방향을 어떻게 고를 수 있을까요?",
+    consultBtn: "우리 아이 맞춤 정보 정리하기",
+    hashtags: ["#입시정보마스터", "#선택과목분석중", "#레이더가동중"]
+  },
+  "곰돌이 응원단형": {
+    emoji: "🐻",
+    color: "#8B5E3C",
+    bgGrad: "linear-gradient(160deg,#8B5E3C,#C49A6C,#F5DEB3)",
+    textColor: "#fff",
+    tagline: "\"괜찮아!\"를 하루 세 번 이상 말하지만,\n속은 하나도 안 괜찮을 때가 있음.",
+    fact: "아이에게 부담을 주기 싫어서 늘 웃어주지만,\n<strong>혼자 있을 때는 검색창에\n\"고1 지금부터 괜찮을까요\"를 칩니다.</strong>",
+    childVoice: "\"부모님이 날 믿어주는 건 좋은데,\n가끔은 방향도 같이 잡아줬으면 좋겠어.\"",
+    strength: "아이에게 정서적 안정감과 회복력을 줍니다. 실패해도 다시 일어설 수 있는 집안 분위기를 만들어주는 힘이 있습니다.",
+    sentence: "\"괜찮아. 그런데\n다음 한 걸음은 같이 정해볼까?\"",
+    consultQ: "응원과 방향 제시의 균형을\n어떻게 잡으면 좋을까요?",
+    consultBtn: "우리 아이 다음 한 걸음 찾기",
+    hashtags: ["#무한긍정부모", "#응원은내몫", "#속으론검색중"]
+  },
+  "독수리 코치형": {
+    emoji: "🦅",
+    color: "#118AB2",
+    bgGrad: "linear-gradient(160deg,#118AB2,#06D6A0,#90E0EF)",
+    textColor: "#fff",
+    tagline: "높은 곳에서 전체 판을 봅니다.\n가끔 아이는 그 판 위의 말이 된 기분입니다.",
+    fact: "학습, 수행평가, 진로, 선택과목을 하나의 로드맵으로 연결하려는 능력이 있습니다.\n<strong>다만 아이가 '내 인생인데?' 모드가 될 때가 있습니다.</strong>",
+    childVoice: "\"전략은 좋은데,\n내 목소리도 작전회의에 넣어줘.\"",
+    strength: "막막한 진로와 입시를 구조화해주는 힘이 있습니다. 아이가 방향을 잃지 않도록 큰 그림을 그려주는 탁월한 능력이 있습니다.",
+    sentence: "\"내 생각은 이래.\n네 생각은 어때?\"",
+    consultQ: "부모의 전략과 아이의 선택권은\n어떻게 함께 갈 수 있을까요?",
+    consultBtn: "진로 로드맵 같이 점검하기",
+    hashtags: ["#사랑도계획적으로", "#큰그림부모", "#전략코치"]
+  },
+  "현자 부엉이형": {
+    emoji: "🦉",
+    color: "#4B3832",
+    bgGrad: "linear-gradient(160deg,#4B3832,#9C7C6E,#D4B896)",
+    textColor: "#fff",
+    tagline: "답을 바로 주지 않습니다.\n아이는 가끔 면접장에 온 줄 압니다.",
+    fact: "\"너는 어떻게 생각해?\"를 자주 말합니다. 좋은 접근입니다.\n<strong>다만 아이가 정말 답을 몰라서 물어볼 때는\n살짝 답답할 수 있습니다.</strong>",
+    childVoice: "\"좋은 질문인 건 알겠는데,\n오늘은 그냥 답을 듣고 싶었어…\"",
+    strength: "아이의 자기주도성과 사고력을 키워줍니다. 스스로 생각하고 결정하는 힘을 길러주는 최고의 코치입니다.",
+    sentence: "\"네 생각을 먼저 듣고,\n필요하면 내 의견도 말해줄게.\"",
+    consultQ: "질문으로 여는 대화와\n구체적 조언의 균형은 어떻게 잡을까요?",
+    consultBtn: "우리 집 대화 방식 점검하기",
+    hashtags: ["#질문하는부모", "#자기주도육아", "#현자의길"]
+  }
+};
+
+// 통계 데이터 (랜덤 + 현실감)
+function generateStats(myType) {
+  const names = Object.keys(TYPES);
+  const base = { "경주마 매니저형":28,"나무늘보 부처님형":12,"음지의 비밀요원형":18,"감정 롤러코스터형":22,"입시레이더 여우형":8,"곰돌이 응원단형":5,"독수리 코치형":4,"현자 부엉이형":3 };
+  return names.map(n => ({
+    name: n,
+    emoji: TYPES[n].emoji,
+    pct: base[n],
+    isMe: n === myType
+  })).sort((a,b) => b.pct - a.pct);
+}
+
+// ══════════════════════════
+// 상태
+// ══════════════════════════
+let currentQ = 0;
+let answers = [];
+let timerInterval = null;
+let secondsLeft = 120;
+
+// ══════════════════════════
+// 화면 전환
+// ══════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+
+// ══════════════════════════
+// 타이머
+// ══════════════════════════
+function startTimer() {
+  secondsLeft = 150;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerDisplay();
+    if (secondsLeft <= 0) { clearInterval(timerInterval); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  const el = document.getElementById('q-timer');
+  if (el) el.textContent = `⏱ ${m}:${s.toString().padStart(2,'0')}`;
+}
+
+// ══════════════════════════
+// 테스트 시작
+// ══════════════════════════
+function startTest() {
+  currentQ = 0;
+  answers = [];
+  showScreen('screen-question');
+  renderQuestion();
+  startTimer();
+}
+
+// ══════════════════════════
+// 문항 렌더링
+// ══════════════════════════
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  document.getElementById('q-num-text').textContent = `${currentQ+1} / ${QUESTIONS.length}`;
+  document.getElementById('progress-fill').style.width = `${((currentQ+1)/QUESTIONS.length)*100}%`;
+
+  document.getElementById('q-scene-text').textContent = q.scene;
+
+  const quoteEl = document.getElementById('q-scene-quote');
+  if (q.quote) {
+    quoteEl.textContent = q.quote;
+    quoteEl.classList.remove('hidden');
+  } else {
+    quoteEl.classList.add('hidden');
+  }
+
+  const optionsEl = document.getElementById('q-options');
+  optionsEl.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'q-option';
+    div.innerHTML = `<div class="option-badge">${labels[i]}</div><div class="option-text">${opt.text}</div>`;
+    div.onclick = () => selectOption(i, div);
+    optionsEl.appendChild(div);
+  });
+
+  const btnNext = document.getElementById('btn-next');
+  btnNext.classList.remove('active');
+  btnNext.textContent = currentQ < QUESTIONS.length - 1 ? '다음 →' : '결과 보기 🎉';
+}
+
+function selectOption(idx, el) {
+  document.querySelectorAll('.q-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[currentQ] = QUESTIONS[currentQ].options[idx].type;
+  document.getElementById('btn-next').classList.add('active');
+}
+
+// ══════════════════════════
+// 다음 문항
+// ══════════════════════════
+function nextQuestion() {
+  if (answers[currentQ] === undefined) return;
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+    window.scrollTo(0,0);
+  } else {
+    clearInterval(timerInterval);
+    showLoading();
+  }
+}
+
+// ══════════════════════════
+// 로딩
+// ══════════════════════════
+function showLoading() {
+  showScreen('screen-loading');
+  const msgs = [
+    { emoji: '🔍', text: '성향 분석 중...', sub: '솔직하게 답하셨죠? 😅' },
+    { emoji: '🧬', text: '학부모 DNA 추출 중...', sub: '잠깐만요, 거의 다 됐어요' },
+    { emoji: '🎭', text: '캐릭터 매칭 중...', sub: '결과가 좀... 강렬할 수 있습니다' },
+    { emoji: '✨', text: '결과 완성!', sub: '뜨끔하셔도 놀라지 마세요 😂' }
+  ];
+  let i = 0;
+  const update = () => {
+    if (i >= msgs.length) { showResult(); return; }
+    document.getElementById('loading-emoji').textContent = msgs[i].emoji;
+    document.getElementById('loading-text').textContent = msgs[i].text;
+    document.getElementById('loading-sub').textContent = msgs[i].sub;
+    i++;
+    setTimeout(update, 700);
+  };
+  setTimeout(update, 200);
+}
+
+// ══════════════════════════
+// 유형 계산
+// ══════════════════════════
+function calcType() {
+  const count = { A:0, B:0, C:0, D:0 };
+  answers.forEach(a => { if(a) count[a]++; });
+  const sorted = Object.entries(count).sort((a,b)=>b[1]-a[1]);
+  const main = sorted[0][0];
+  const sub  = sorted[1][0];
+
+  const map = {
+    'A': { 'C': '경주마 매니저형', 'D': '독수리 코치형', default: '경주마 매니저형' },
+    'B': { 'D': '곰돌이 응원단형', default: '나무늘보 부처님형' },
+    'C': { 'A': '입시레이더 여우형', default: '음지의 비밀요원형' },
+    'D': { 'A': '현자 부엉이형', default: '감정 롤러코스터형' }
+  };
+
+  return (map[main] && map[main][sub]) ? map[main][sub] : (map[main] && map[main].default) || '감정 롤러코스터형';
+}
+
+// ══════════════════════════
+// 결과 표시
+// ══════════════════════════
+function showResult() {
+  const typeName = calcType();
+  const t = TYPES[typeName];
+
+  showScreen('screen-result');
+
+  // 히어로 배경
+  document.getElementById('result-hero').style.color = t.textColor;
+  document.getElementById('result-hero-bg').style.background = t.bgGrad;
+
+  document.getElementById('result-animal').textContent = t.emoji;
+  document.getElementById('result-type-name').textContent = typeName;
+  document.getElementById('result-tagline').textContent = t.tagline;
+
+  // 해시태그
+  const htEl = document.getElementById('result-hashtags');
+  htEl.innerHTML = t.hashtags.map(h => `<span class="hashtag">${h}</span>`).join('');
+
+  // 팩트
+  document.getElementById('result-fact').innerHTML = t.fact.replace(/\n/g,'<br>');
+  document.getElementById('result-child-voice').textContent = t.childVoice;
+  document.getElementById('result-strength').textContent = t.strength;
+  document.getElementById('result-sentence').textContent = t.sentence;
+
+  // 상담
+  document.getElementById('result-consult-q').textContent = t.consultQ;
+  document.getElementById('btn-consult').textContent = '📋 ' + t.consultBtn;
+  document.getElementById('btn-consult').onclick = openConsultForm;
+
+  // 통계
+  renderStats(typeName);
+}
+
+function renderStats(myType) {
+  const stats = generateStats(myType);
+  const el = document.getElementById('stats-bars');
+  el.innerHTML = stats.map(s => `
+    <div class="stats-bar-row">
+      <span class="stats-emoji">${s.emoji}</span>
+      <span class="stats-name">${s.name.replace(/형$/,'')}</span>
+      <div class="stats-bar">
+        <div class="stats-bar-fill ${s.isMe?'highlight':''}" style="width:0%" data-pct="${s.pct}"></div>
+      </div>
+      <span class="stats-pct">${s.pct}%</span>
+    </div>
+  `).join('');
+
+  // 애니메이션
+  setTimeout(() => {
+    el.querySelectorAll('.stats-bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 300);
+}
+
+// ══════════════════════════
+// 다시하기
+// ══════════════════════════
+function retryTest() {
+  showScreen('screen-intro');
+}
+
+// ══════════════════════════
+// 상담 버튼
+// ══════════════════════════
+function openConsultForm() {
+  alert('📋 상담 신청 링크는 설명회 당일 안내됩니다.\n결과 화면을 캡처해서 상담 시 보여주세요!');
+}
+
+// ══════════════════════════
+// 결과 저장 안내
+// ══════════════════════════
+function openCapture() {
+  alert('📸 휴대폰의 캡처 기능으로 결과 화면을 저장해 주세요!\n\niOS: 전원 + 볼륨UP 동시 누름\nAndroid: 전원 + 볼륨DOWN 동시 누름');
+}
+</script>
+</body>
+</html>
