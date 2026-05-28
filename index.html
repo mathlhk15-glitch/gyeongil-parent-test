@@ -351,31 +351,37 @@
     color: #333;
   }
 
-  .btn-next {
-    width: 100%;
-    max-width: 480px;
-    margin: 16px auto 0;
-    display: block;
-    background: var(--primary);
-    color: #fff;
+  .btn-row {
+    display: flex;
+    padding: 4px 20px 24px;
+  }
+
+  .btn-prev {
+    background: var(--light-gray);
+    color: var(--gray);
     border: none;
     border-radius: 50px;
-    padding: 16px;
-    font-size: 16px;
-    font-weight: 700;
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    opacity: 0.4;
+    font-family: inherit;
+  }
+
+  .btn-prev:hover:not(:disabled) {
+    background: #E8E8E8;
+    color: var(--dark);
+  }
+
+  .btn-prev:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+
+  .q-options.locked .q-option {
     pointer-events: none;
   }
-
-  .btn-next.active {
-    opacity: 1;
-    pointer-events: auto;
-    box-shadow: var(--shadow);
-  }
-
-  .btn-next.active:hover { transform: translateY(-2px); }
 
   /* ══════════════════════════════
      LOADING SCREEN
@@ -828,7 +834,9 @@
     <div class="q-options" id="q-options"></div>
   </div>
 
-  <button class="btn-next" id="btn-next" onclick="nextQuestion()">다음 →</button>
+  <div class="btn-row">
+    <button class="btn-prev" id="btn-prev" onclick="prevQuestion()">← 이전 문항</button>
+  </div>
 </section>
 
 <!-- ══════════ 로딩 ══════════ -->
@@ -880,7 +888,7 @@
 
     <!-- 참여자 통계 -->
     <div class="result-card stats-card">
-      <div class="card-label">📊 설명회용 샘플 유형 분포</div>
+      <div class="card-label" id="stats-card-label">📊 유형 분포</div>
       <div id="stats-bars"></div>
     </div>
 
@@ -1013,7 +1021,7 @@ const TYPES = {
   "경주마 매니저형": {
     emoji: "🐴",
     color: "#FF6B35",
-    bgGrad: "linear-gradient(160deg,#FF6B35,#FF9A5C,#FFD166)",
+    bgGrad: "linear-gradient(160deg,#C43E00,#FF6B35,#FF9A5C)",
     textColor: "#fff",
     tagline: "겉으로는 쿨한 척하지만,\n마음속으론 이미 자녀 대학 입학식 축사 쓰는 중.",
     fact: "시험지를 보면 '고생했어'보다 <strong>틀린 문제가 먼저 보입니다.</strong>\n사랑이 없는 게 아닙니다. 사랑이 너무 빠르게 분석표로 변환될 뿐입니다.",
@@ -1027,7 +1035,7 @@ const TYPES = {
   "나무늘보 부처님형": {
     emoji: "🦥",
     color: "#06D6A0",
-    bgGrad: "linear-gradient(160deg,#06D6A0,#48CAE4,#ADE8F4)",
+    bgGrad: "linear-gradient(160deg,#028A6E,#06D6A0,#48CAE4)",
     textColor: "#fff",
     tagline: "\"건강하면 됐다\"가 모토인데,\n진짜 건강만 할까 봐 요즘 살짝 무서움.",
     fact: "성적표를 숨겨도 '그럴 수 있지' 하고 넘어갑니다.\n사실은 <strong>입시 제도가 너무 복잡해서 마음속으로\n잠깐 전원 버튼을 끈 적도 있습니다.</strong>",
@@ -1055,7 +1063,7 @@ const TYPES = {
   "감정 롤러코스터형": {
     emoji: "🎢",
     color: "#EF476F",
-    bgGrad: "linear-gradient(160deg,#EF476F,#FF6B6B,#FFB3C6)",
+    bgGrad: "linear-gradient(160deg,#A30030,#EF476F,#FF6B6B)",
     textColor: "#fff",
     tagline: "아이 성적표가 나왔는데,\n왜 내 심장이 시험을 보나요?",
     fact: "<strong>화냈다가, 미안해서 야식 사줬다가,\n다시 공부 안 하는 모습 보고 뒷목 잡습니다.</strong>\n사랑이 깊어서 반응도 깊습니다.",
@@ -1069,7 +1077,7 @@ const TYPES = {
   "입시레이더 여우형": {
     emoji: "🦊",
     color: "#F77F00",
-    bgGrad: "linear-gradient(160deg,#F77F00,#FCBF49,#EAE2B7)",
+    bgGrad: "linear-gradient(160deg,#B35900,#F77F00,#FCBF49)",
     textColor: "#fff",
     tagline: "학교 공지보다 빠르고,\n아이 말보다 입시 밴드 알림을 먼저 봅니다.",
     fact: "선택과목, 생기부, 학과 전망, 전형 변화에 민감합니다.\n<strong>문제는 정보가 많아질수록 마음도 같이 바빠진다는 점입니다.</strong>",
@@ -1083,7 +1091,7 @@ const TYPES = {
   "곰돌이 응원단형": {
     emoji: "🐻",
     color: "#8B5E3C",
-    bgGrad: "linear-gradient(160deg,#8B5E3C,#C49A6C,#F5DEB3)",
+    bgGrad: "linear-gradient(160deg,#5C3D1E,#8B5E3C,#C49A6C)",
     textColor: "#fff",
     tagline: "\"괜찮아!\"를 하루 세 번 이상 말하지만,\n속은 하나도 안 괜찮을 때가 있음.",
     fact: "아이에게 부담을 주기 싫어서 늘 웃어주지만,\n<strong>혼자 있을 때는 검색창에\n\"고1 지금부터 괜찮을까요\"를 칩니다.</strong>",
@@ -1111,7 +1119,7 @@ const TYPES = {
   "현자 부엉이형": {
     emoji: "🦉",
     color: "#4B3832",
-    bgGrad: "linear-gradient(160deg,#4B3832,#9C7C6E,#D4B896)",
+    bgGrad: "linear-gradient(160deg,#2C1810,#4B3832,#7A5C4E)",
     textColor: "#fff",
     tagline: "답을 바로 주지 않습니다.\n아이는 가끔 면접장에 온 줄 압니다.",
     fact: "\"너는 어떻게 생각해?\"를 자주 말합니다. 좋은 접근입니다.\n<strong>다만 아이가 정말 답을 몰라서 물어볼 때는\n살짝 답답할 수 있습니다.</strong>",
@@ -1124,14 +1132,64 @@ const TYPES = {
   }
 };
 
-// 통계 데이터 (랜덤 + 현실감)
-function generateStats(myType) {
-  const names = Object.keys(TYPES);
-  const base = { "경주마 매니저형":28,"나무늘보 부처님형":12,"음지의 비밀요원형":18,"감정 롤러코스터형":22,"입시레이더 여우형":8,"곰돌이 응원단형":5,"독수리 코치형":4,"현자 부엉이형":3 };
-  return names.map(n => ({
+// ══════════════════════════
+// Google Apps Script URL
+// ══════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxibwVigqzH5qoXbOhjNb2MmIi9asCPAdXC-L_kIAflEMRoPlJGrMNRU96xZBhcdUB6/exec';
+
+// 결과 저장 (POST, no-cors — GAS에 쓰기만 하면 됨)
+async function saveResult(typeName) {
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: typeName, ts: new Date().toISOString() })
+    });
+  } catch(e) { console.warn('저장 실패:', e); }
+}
+
+// 통계 조회 — script 태그 JSONP 방식으로 CORS 완전 우회
+function fetchStats(myType) {
+  const fallback = { "경주마 매니저형":28,"나무늘보 부처님형":12,"음지의 비밀요원형":18,"감정 롤러코스터형":22,"입시레이더 여우형":8,"곰돌이 응원단형":5,"독수리 코치형":4,"현자 부엉이형":3 };
+
+  return new Promise((resolve) => {
+    const cbName = '_gasCallback_' + Date.now();
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      cleanup();
+      console.warn('GAS 통계 타임아웃, 샘플 사용');
+      resolve(buildStats(fallback, myType));
+    }, 5000);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = (json) => {
+      cleanup();
+      if (json && json.status === 'ok' && json.data) {
+        resolve(buildStats(json.data, myType));
+      } else {
+        resolve(buildStats(fallback, myType));
+      }
+    };
+
+    script.src = GAS_URL + '?action=stats&callback=' + cbName;
+    script.onerror = () => { cleanup(); resolve(buildStats(fallback, myType)); };
+    document.head.appendChild(script);
+  });
+}
+
+function buildStats(data, myType) {
+  const total = Object.values(data).reduce((s,v) => s+v, 0) || 1;
+  return Object.keys(TYPES).map(n => ({
     name: n,
     emoji: TYPES[n].emoji,
-    pct: base[n],
+    pct: Math.round((data[n] || 0) / total * 100),
+    count: data[n] || 0,
     isMe: n === myType
   })).sort((a,b) => b.pct - a.pct);
 }
@@ -1204,40 +1262,48 @@ function renderQuestion() {
 
   const optionsEl = document.getElementById('q-options');
   optionsEl.innerHTML = '';
+  optionsEl.classList.remove('locked');
   const labels = ['A','B','C','D'];
   q.options.forEach((opt, i) => {
     const div = document.createElement('div');
     div.className = 'q-option';
+    if (answers[currentQ] === opt.type) div.classList.add('selected');
     div.innerHTML = `<div class="option-badge">${labels[i]}</div><div class="option-text">${opt.text}</div>`;
     div.onclick = () => selectOption(i, div);
     optionsEl.appendChild(div);
   });
 
-  const btnNext = document.getElementById('btn-next');
-  btnNext.classList.remove('active');
-  btnNext.textContent = currentQ < QUESTIONS.length - 1 ? '다음 →' : '결과 보기 🎉';
+  document.getElementById('btn-prev').disabled = currentQ === 0;
 }
 
 function selectOption(idx, el) {
   document.querySelectorAll('.q-option').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
   answers[currentQ] = QUESTIONS[currentQ].options[idx].type;
-  document.getElementById('btn-next').classList.add('active');
+
+  const optionsEl = document.getElementById('q-options');
+  optionsEl.classList.add('locked');
+
+  setTimeout(() => {
+    if (currentQ < QUESTIONS.length - 1) {
+      currentQ++;
+      renderQuestion();
+      window.scrollTo(0, 0);
+    } else {
+      clearInterval(timerInterval);
+      showLoading();
+    }
+  }, 320);
 }
 
 // ══════════════════════════
-// 다음 문항
+// 이전 문항
 // ══════════════════════════
-function nextQuestion() {
-  if (answers[currentQ] === undefined) return;
-  if (currentQ < QUESTIONS.length - 1) {
-    currentQ++;
-    renderQuestion();
-    window.scrollTo(0,0);
-  } else {
-    clearInterval(timerInterval);
-    showLoading();
-  }
+function prevQuestion() {
+  if (currentQ === 0) return;
+  currentQ--;
+  renderQuestion();
+  window.scrollTo(0, 0);
 }
 
 // ══════════════════════════
@@ -1293,8 +1359,10 @@ function showResult() {
   showScreen('screen-result');
 
   // 히어로 배경
-  document.getElementById('result-hero').style.color = t.textColor;
-  document.getElementById('result-hero-bg').style.background = t.bgGrad;
+  const heroEl = document.getElementById('result-hero');
+  heroEl.style.background = t.bgGrad;
+  heroEl.style.color = t.textColor;
+  document.getElementById('result-hero-bg').style.background = 'transparent';
 
   document.getElementById('result-animal').textContent = t.emoji;
   document.getElementById('result-type-name').textContent = typeName;
@@ -1315,13 +1383,26 @@ function showResult() {
   document.getElementById('btn-consult').textContent = '📋 ' + t.consultBtn;
   document.getElementById('btn-consult').onclick = openConsultForm;
 
-  // 통계
+  // 결과 저장 + 통계 로드
+  saveResult(typeName);
   renderStats(typeName);
 }
 
-function renderStats(myType) {
-  const stats = generateStats(myType);
+async function renderStats(myType) {
   const el = document.getElementById('stats-bars');
+  const labelEl = document.getElementById('stats-card-label');
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px;">📊 집계 중...</div>';
+
+  const stats = await fetchStats(myType);
+  const total = stats.reduce((s,v) => s + v.count, 0);
+  const isLive = total !== 100; // fallback 합계는 항상 100
+
+  if (labelEl) {
+    labelEl.innerHTML = isLive
+      ? `📊 실시간 유형 분포 <span style="font-size:10px;color:#06D6A0;font-weight:700;">● LIVE ${total}명</span>`
+      : `📊 유형 분포 <span style="font-size:10px;color:#aaa;">(샘플 데이터)</span>`;
+  }
+
   el.innerHTML = stats.map(s => `
     <div class="stats-bar-row">
       <span class="stats-emoji">${s.emoji}</span>
@@ -1333,7 +1414,6 @@ function renderStats(myType) {
     </div>
   `).join('');
 
-  // 애니메이션
   setTimeout(() => {
     el.querySelectorAll('.stats-bar-fill').forEach(el => {
       el.style.width = el.dataset.pct + '%';
