@@ -1314,19 +1314,21 @@ async function saveResult(typeName) {
   } catch(e) { console.warn('저장 실패:', e); }
 }
 
-// 통계 조회 — script 태그 JSONP 방식으로 CORS 완전 우회
-// GAS(서버) 통계를 우선 시도하고, 응답이 없거나 실패하면
-// 이 기기에 쌓인 로컬 통계를 사용한다. 로컬 통계도 없으면
-// 마지막으로 정적 샘플 데이터를 보여준다.
-function fetchStats(myType) {
+// 통계 조회 — 캐싱으로 GAS 중복 요청 방지
+// 한 번 받아온 raw 데이터를 statsCache에 저장해두고,
+// 이후 호출은 캐시에서 즉시 반환한다.
+let statsCache = null; // { raw, source } 형태로 저장
+
+function fetchRawStats() {
+  // 이미 받아온 데이터가 있으면 즉시 반환
+  if (statsCache) return Promise.resolve(statsCache);
+
   const sample = { "경주마 매니저형":28,"나무늘보 부처님형":12,"음지의 비밀요원형":18,"감정 롤러코스터형":22,"입시레이더 여우형":8,"곰돌이 응원단형":5,"독수리 코치형":4,"현자 부엉이형":3 };
 
   function localOrSample() {
     const local = getLocalStats();
-    if (Object.keys(local).length > 0) {
-      return { stats: buildStats(local, myType), source: 'local' };
-    }
-    return { stats: buildStats(sample, myType), source: 'sample' };
+    if (Object.keys(local).length > 0) return { raw: local, source: 'local' };
+    return { raw: sample, source: 'sample' };
   }
 
   return new Promise((resolve) => {
@@ -1335,7 +1337,9 @@ function fetchStats(myType) {
     const timer = setTimeout(() => {
       cleanup();
       console.warn('GAS 통계 타임아웃, 로컬/샘플 사용');
-      resolve(localOrSample());
+      const result = localOrSample();
+      statsCache = result;
+      resolve(result);
     }, 5000);
 
     function cleanup() {
@@ -1346,17 +1350,24 @@ function fetchStats(myType) {
 
     window[cbName] = (json) => {
       cleanup();
-      if (json && json.status === 'ok' && json.data) {
-        resolve({ stats: buildStats(json.data, myType), source: 'live' });
-      } else {
-        resolve(localOrSample());
-      }
+      const result = (json && json.status === 'ok' && json.data)
+        ? { raw: json.data, source: 'live' }
+        : localOrSample();
+      statsCache = result;
+      resolve(result);
     };
 
     script.src = GAS_URL + '?action=stats&callback=' + cbName;
-    script.onerror = () => { cleanup(); resolve(localOrSample()); };
+    script.onerror = () => { cleanup(); const r = localOrSample(); statsCache = r; resolve(r); };
     document.head.appendChild(script);
   });
+}
+
+function fetchStats(myType) {
+  return fetchRawStats().then(({ raw, source }) => ({
+    stats: buildStats(raw, myType),
+    source
+  }));
 }
 
 function buildStats(data, myType) {
