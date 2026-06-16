@@ -716,13 +716,7 @@
 
   .btn-retry:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
-  /* 통계 섹션 */
-  .stats-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow-card);
-  }
+
 
   .stats-bar-row {
     display: flex;
@@ -969,10 +963,6 @@
       <div class="today-sentence" id="result-sentence"></div>
     </div>
 
-    <!-- 참여자 통계 -->
-    <div class="result-card stats-card">
-      <div class="card-label" id="stats-card-label">📊 유형 분포</div>
-      <div id="stats-bars"></div>
 
     </div>
 
@@ -1266,7 +1256,6 @@ function closeStatsModal(e) {
 async function renderModalStats() {
   const barsEl  = document.getElementById('modal-stats-bars');
   const labelEl = document.getElementById('modal-stats-label');
-  const srcEl   = document.getElementById('modal-stats-source');
   barsEl.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px;">📊 집계 중...</div>';
 
   const { stats, source } = await fetchStats(null);
@@ -1278,10 +1267,6 @@ async function renderModalStats() {
       ? `<span style="font-size:10px;color:#FFD166;font-weight:700;">● 이 기기 ${total}명</span>`
       : `<span style="font-size:10px;color:#aaa;">(샘플 데이터)</span>`;
   labelEl.innerHTML = `📊 유형 분포 ${labelSuffix}`;
-
-  srcEl.textContent = source === 'live' ? '실시간 서버 집계'
-    : source === 'local' ? '이 기기 누적 집계'
-    : '참고용 샘플 데이터';
 
   barsEl.innerHTML = stats.map(s => `
     <div class="stats-bar-row">
@@ -1314,14 +1299,8 @@ async function saveResult(typeName) {
   } catch(e) { console.warn('저장 실패:', e); }
 }
 
-// 통계 조회 — 캐싱으로 GAS 중복 요청 방지
-// 한 번 받아온 raw 데이터를 statsCache에 저장해두고,
-// 이후 호출은 캐시에서 즉시 반환한다.
-let statsCache = null; // { raw, source } 형태로 저장
-
+// 통계 조회 — GAS 서버 요청
 function fetchRawStats() {
-  // 이미 받아온 데이터가 있으면 즉시 반환
-  if (statsCache) return Promise.resolve(statsCache);
 
   const sample = { "경주마 매니저형":28,"나무늘보 부처님형":12,"음지의 비밀요원형":18,"감정 롤러코스터형":22,"입시레이더 여우형":8,"곰돌이 응원단형":5,"독수리 코치형":4,"현자 부엉이형":3 };
 
@@ -1338,7 +1317,6 @@ function fetchRawStats() {
       cleanup();
       console.warn('GAS 통계 타임아웃, 로컬/샘플 사용');
       const result = localOrSample();
-      statsCache = result;
       resolve(result);
     }, 5000);
 
@@ -1353,12 +1331,11 @@ function fetchRawStats() {
       const result = (json && json.status === 'ok' && json.data)
         ? { raw: json.data, source: 'live' }
         : localOrSample();
-      statsCache = result;
       resolve(result);
     };
 
     script.src = GAS_URL + '?action=stats&callback=' + cbName;
-    script.onerror = () => { cleanup(); const r = localOrSample(); statsCache = r; resolve(r); };
+    script.onerror = () => { cleanup(); resolve(localOrSample()); };
     document.head.appendChild(script);
   });
 }
@@ -1602,45 +1579,10 @@ function showResult() {
   document.getElementById('btn-consult').textContent = '📋 ' + t.consultBtn;
   document.getElementById('btn-consult').onclick = openConsultForm;
 
-  // 결과 저장 + 통계 로드
+  // 결과 저장
   saveResult(typeName);
-  renderStats(typeName);
 }
 
-async function renderStats(myType) {
-  const el = document.getElementById('stats-bars');
-  const labelEl = document.getElementById('stats-card-label');
-  el.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px;">📊 집계 중...</div>';
-
-  const { stats, source } = await fetchStats(myType);
-  const total = stats.reduce((s,v) => s + v.count, 0);
-
-  if (labelEl) {
-    const labelSuffix = source === 'live'
-      ? `<span style="font-size:10px;color:#06D6A0;font-weight:700;">● LIVE ${total}명</span>`
-      : source === 'local'
-        ? `<span style="font-size:10px;color:#FFD166;font-weight:700;">● 이 기기 ${total}명</span>`
-        : `<span style="font-size:10px;color:#aaa;">(샘플 데이터)</span>`;
-    labelEl.innerHTML = `📊 유형 분포 ${labelSuffix}`;
-  }
-
-  el.innerHTML = stats.map(s => `
-    <div class="stats-bar-row">
-      <span class="stats-emoji">${s.emoji}</span>
-      <span class="stats-name">${s.name.replace(/형$/,'')}</span>
-      <div class="stats-bar">
-        <div class="stats-bar-fill ${s.isMe?'highlight':''}" style="width:0%" data-pct="${s.pct}"></div>
-      </div>
-      <span class="stats-pct">${s.pct}%</span>
-    </div>
-  `).join('');
-
-  setTimeout(() => {
-    el.querySelectorAll('.stats-bar-fill').forEach(el => {
-      el.style.width = el.dataset.pct + '%';
-    });
-  }, 300);
-}
 
 // ══════════════════════════
 // 다시하기
