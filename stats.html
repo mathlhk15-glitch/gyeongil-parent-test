@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리 집 교육 캐릭터 — 실시간 결과</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#13203A; --navy2:#1B2B4B; --gold:#F6C445; --teal:#4FD1C5;
+    --ink:#1B2B4B; --muted:#64748B; --track:#E8EDF4; --white:#fff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Noto Sans KR','Malgun Gothic',sans-serif;
+    background:var(--navy); color:var(--white);
+    display:flex; flex-direction:column;
+    padding:2.6vh 3.2vw 2.4vh;
+    overflow:hidden;
+  }
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:2vw;margin-bottom:2.2vh}
+  .kicker{color:var(--gold);font-weight:700;font-size:clamp(13px,1.5vw,22px);letter-spacing:.02em}
+  h1{font-weight:900;font-size:clamp(24px,3.4vw,52px);line-height:1.15;margin-top:.4vh}
+  h1 em{font-style:normal;color:var(--gold)}
+  .meta{display:flex;align-items:center;gap:1.6vw;flex-shrink:0}
+  .total{text-align:right}
+  .total b{display:block;font-size:clamp(34px,5.2vw,84px);font-weight:900;color:var(--gold);line-height:1}
+  .total span{font-size:clamp(12px,1.2vw,18px);color:#C9D3E3}
+  .badge{display:flex;align-items:center;gap:.5em;background:#ffffff14;border:1px solid #ffffff2a;
+    border-radius:99px;padding:.5em 1.1em;font-weight:700;font-size:clamp(12px,1.2vw,18px)}
+  .dot{width:.7em;height:.7em;border-radius:50%;background:#94A3B8}
+  .dot.live{background:#22C55E;animation:pulse 1.4s infinite}
+  .dot.error{background:#EF4444}
+  @keyframes pulse{50%{opacity:.35}}
+
+  .board{flex:1;background:var(--white);color:var(--ink);border-radius:22px;
+    padding:2.6vh 2.6vw;display:grid;grid-template-rows:repeat(8,1fr);gap:1.1vh;min-height:0}
+  .row{display:grid;grid-template-columns:4.2vw 21vw 1fr 9.5vw;align-items:center;gap:1.2vw;min-height:0}
+  .emo{font-size:clamp(22px,3vw,48px);text-align:center;line-height:1}
+  .name{font-weight:700;font-size:clamp(14px,1.75vw,28px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .name .crown{display:inline-block;margin-left:.4em;background:var(--gold);color:var(--navy);
+    font-size:.62em;font-weight:900;padding:.15em .6em;border-radius:99px;vertical-align:middle}
+  .track{height:62%;min-height:14px;background:var(--track);border-radius:99px;overflow:hidden}
+  .fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#3B82F6,#4FD1C5);
+    transition:width 1s cubic-bezier(.4,0,.2,1)}
+  .row.top .fill{background:linear-gradient(90deg,#F59E0B,#F6C445)}
+  .row.top .name{color:#B45309}
+  .num{text-align:right;white-space:nowrap}
+  .num b{font-size:clamp(16px,2.1vw,34px);font-weight:900}
+  .num span{font-size:clamp(11px,1.15vw,18px);color:var(--muted);margin-left:.35em}
+  .empty{grid-row:1/-1;display:flex;align-items:center;justify-content:center;color:var(--muted);
+    font-size:clamp(16px,2vw,28px)}
+
+  footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.6vh;
+    font-size:clamp(11px,1.1vw,16px);color:#AFC0D8}
+  footer .msg{color:#fff;font-weight:500}
+  footer .msg em{font-style:normal;color:var(--gold);font-weight:700}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="kicker">창원경일고 학부모 입학설명회 · 우리 집 교육 캐릭터 테스트</div>
+    <h1>오늘 오신 부모님들은 <em>어떤 캐릭터</em>일까요?</h1>
+  </div>
+  <div class="meta">
+    <div class="badge"><div class="dot" id="dot"></div><span id="status">연결 중</span></div>
+    <div class="total"><b id="total">—</b><span>명 참여</span></div>
+  </div>
+</header>
+
+<main class="board" id="board"><div class="empty">⏳ 결과를 불러오는 중입니다…</div></main>
+
+<footer>
+  <div class="msg">좋은 유형도, 나쁜 유형도 없습니다 — <em>아이를 사랑하는 방식</em>이 다를 뿐입니다</div>
+  <div id="updated">10초마다 자동 갱신</div>
+</footer>
+
+<script>
+// 보기 전용 페이지입니다. 통계 초기화 기능은 넣지 않았습니다(관리용 페이지에서만 사용).
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxibwVigqzH5qoXbOhjNb2MmIi9asCPAdXC-L_kIAflEMRoPlJGrMNRU96xZBhcdUB6/exec';
+const REFRESH_SEC = 10;
+
+const TYPES = [
+  ['경주마 매니저형','🐴'], ['입시레이더 여우형','🦊'], ['나무늘보 부처님형','🦥'], ['곰돌이 응원단형','🐻'],
+  ['음지의 비밀요원형','🕵️'], ['독수리 코치형','🦅'], ['감정 롤러코스터형','🎢'], ['현자 부엉이형','🦉']
+];
+
+const $ = id => document.getElementById(id);
+function setStatus(cls, text){ $('dot').className = 'dot ' + cls; $('status').textContent = text; }
+
+function render(data){
+  const rows = TYPES.map(([name, emo]) => ({ name, emo, n: Number(data[name] || 0) }));
+  const total = rows.reduce((s, r) => s + r.n, 0);
+  $('total').textContent = total;
+  rows.sort((a, b) => b.n - a.n);
+  const max = Math.max(1, ...rows.map(r => r.n));
+  if (total === 0) {
+    $('board').innerHTML = '<div class="empty">아직 참여 결과가 없습니다. 테스트를 마치시면 바로 여기에 나타납니다.</div>';
+    return;
+  }
+  $('board').innerHTML = rows.map((r, i) => {
+    const pct = Math.round(r.n / total * 100);
+    const top = i === 0 && r.n > 0 && r.n === rows[0].n;
+    return `<div class="row${top ? ' top' : ''}">
+      <div class="emo">${r.emo}</div>
+      <div class="name">${r.name}${top ? '<span class="crown">1위</span>' : ''}</div>
+      <div class="track"><div class="fill" data-w="${r.n / max * 100}"></div></div>
+      <div class="num"><b>${r.n}</b><span>명 · ${pct}%</span></div>
+    </div>`;
+  }).join('');
+  requestAnimationFrame(() => setTimeout(() => {
+    document.querySelectorAll('.fill').forEach(el => el.style.width = el.dataset.w + '%');
+  }, 60));
+  const t = new Date();
+  $('updated').textContent = `마지막 갱신 ${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')} · ${REFRESH_SEC}초마다 자동 갱신`;
+}
+
+function load(){
+  // ?demo 를 붙이면 예시 숫자로 화면만 확인합니다(실제 통계와 무관).
+  if (location.search.includes('demo')) {
+    render({'경주마 매니저형':14,'입시레이더 여우형':9,'나무늘보 부처님형':6,'곰돌이 응원단형':17,
+            '음지의 비밀요원형':5,'독수리 코치형':11,'감정 롤러코스터형':8,'현자 부엉이형':4});
+    setStatus('live', '예시 화면'); return;
+  }
+  const cb = '_statsCb_' + Date.now();
+  const s = document.createElement('script');
+  const timer = setTimeout(() => { done(); setStatus('error', '연결 지연 · 다시 시도 중'); }, 8000);
+  function done(){ clearTimeout(timer); delete window[cb]; s.remove(); }
+  window[cb] = json => {
+    done();
+    if (json && json.status === 'ok' && json.data) { render(json.data); setStatus('live', 'LIVE'); }
+    else setStatus('error', '자료 오류');
+  };
+  s.src = GAS_URL + '?action=stats&callback=' + cb;
+  s.onerror = () => { done(); setStatus('error', '인터넷 연결 확인'); };
+  document.head.appendChild(s);
+}
+
+load();
+setInterval(load, REFRESH_SEC * 1000);
+</script>
+</body>
+</html>
